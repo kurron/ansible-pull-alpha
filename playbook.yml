@@ -16,7 +16,7 @@
        group_name: "mysql"
        volume_name: "storage"
        volume_size: "7G"
-       mount_point: "/mnt/mysql"
+       mount_point: "/var/lib/mysql"
        guard_prefix: "ansible-mysql-"
        pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
        vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
