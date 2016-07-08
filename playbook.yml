@@ -115,7 +115,7 @@
   vars:
        cacheSizeGB: 1
        notablescan: 0
-       profilingMode: "slowOp" 
+       profilingMode: "off"
        storageDirectory: "/var/lib/mongodb" 
   tasks:
     - apt_key: state=present keyserver=keyserver.ubuntu.com id=EA312927
