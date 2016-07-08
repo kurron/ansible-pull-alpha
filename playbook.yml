@@ -119,10 +119,10 @@
        storageDirectory: "/var/lib/mongodb" 
   tasks:
     - copy: src=files/disable-transparent-hugepages dest=/etc/init.d/disable-transparent-hugepages mode=0755 backup=no force=yes
+    - command: /usr/sbin/update-rc.d disable-transparent-hugepages defaults
     - apt_key: state=present keyserver=keyserver.ubuntu.com id=EA312927
     - apt_repository: repo='deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse' state=present
     - apt: name=mongodb-org state=latest update_cache=true cache_valid_time=3600 install_recommends=true
     - template: src=templates/mongod.conf dest=/etc/mongod.conf mode=0444 backup=yes force=yes
     - file: path={{ storageDirectory }} owner=mongodb group=mongodb mode=0775 state=directory recurse=true
-    - command: /usr/sbin/update-rc.d disable-transparent-hugepages defaults
     - service: name=mongod state=restarted
