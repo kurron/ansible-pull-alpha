@@ -42,7 +42,7 @@
   become: True
   vars:
        user_account: "root"
-       device_name: "/dev/sdb"
+       device_name: "/dev/sdc"
        group_name: "rabbitmq"
        volume_name: "storage"
        volume_size: "7G"
