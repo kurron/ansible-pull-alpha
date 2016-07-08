@@ -47,7 +47,7 @@
        volume_name: "storage"
        volume_size: "7G"
        mount_point: "/var/lib/rabbitmq"
-       guard_prefix: "ansible-rabbitm1-"
+       guard_prefix: "ansible-rabbitmq-"
        pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
        vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
        lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
@@ -64,6 +64,37 @@
       - file: path={{ mkfs_guard }} state=touch
       - command: /bin/mkdir --parents {{ mount_point }}
       - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} ext4 defaults 0 0"
+      - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
+      - command: /bin/mount -a
+
+- name: Configure the MongoDB Partition
+  hosts: Ubuntu
+  become: True
+  vars:
+       user_account: "root"
+       device_name: "/dev/sdd"
+       group_name: "mongodb"
+       volume_name: "storage"
+       volume_size: "7G"
+       mount_point: "/var/lib/mongodb"
+       guard_prefix: "ansible-mongodb-"
+       pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
+       vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
+       lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
+       mkfs_guard: "/var/{{ guard_prefix }}-mkfs"
+  tasks:
+      - apt: name=xfsprogs state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      - command: /sbin/pvcreate {{ device_name }} creates={{ pvcreate_guard }}
+      - file: path={{ pvcreate_guard }} state=touch
+      - command: /sbin/vgcreate {{ group_name }} {{ device_name }} creates={{ vgcreate_guard }}
+      - file: path={{ vgcreate_guard }} state=touch
+      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }} creates={{ lvcreate_guard }}
+      - file: path={{ lvcreate_guard }} state=touch
+      - command: /sbin/mkfs.xfs /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
+      - file: path={{ mkfs_guard }} state=touch
+      - command: /bin/mkdir --parents {{ mount_point }}
+      - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} xfs defaults 0 0"
       - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
       - command: /bin/mount -a
 
