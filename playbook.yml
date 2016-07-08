@@ -21,7 +21,7 @@
        pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
        vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
        lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
-       mkfs-guard: "/var/{{ guard_prefix }}-mkfs"
+       mkfs_guard: "/var/{{ guard_prefix }}-mkfs"
   tasks:
       - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - command: /sbin/pvcreate {{ device_name }} creates={{ pvcreate_guard }}
