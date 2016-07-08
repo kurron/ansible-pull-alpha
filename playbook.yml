@@ -106,3 +106,4 @@
       - copy: src=files/rabbitmq.config dest=/etc/rabbitmq owner=root group=root mode=644 backup=yes
       - command: rabbitmq-plugins enable rabbitmq_management
       - service: name=rabbitmq-server state=restarted
+      - command: rabbitmqctl status
