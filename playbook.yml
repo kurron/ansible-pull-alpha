@@ -11,7 +11,6 @@
   hosts: Ubuntu
   become: True
   vars:
-       user_account: "root"
        device_name: "/dev/sdb"
        group_name: "mysql"
        volume_name: "storage"
@@ -32,16 +31,12 @@
       - file: path={{ lvcreate_guard }} state=touch
       - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
       - file: path={{ mkfs_guard }} state=touch
-      - command: /bin/mkdir --parents {{ mount_point }}
-      - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} ext4 defaults 0 0"
-      - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
-      - command: /bin/mount -a
+      - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=ext4 opts=noatime state=mounted
 
 - name: Configure the RabbitMQ Partition
   hosts: Ubuntu
   become: True
   vars:
-       user_account: "root"
        device_name: "/dev/sdc"
        group_name: "rabbitmq"
        volume_name: "storage"
@@ -62,16 +57,12 @@
       - file: path={{ lvcreate_guard }} state=touch
       - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
       - file: path={{ mkfs_guard }} state=touch
-      - command: /bin/mkdir --parents {{ mount_point }}
-      - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} ext4 defaults 0 0"
-      - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
-      - command: /bin/mount -a
+      - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=ext4 opts=noatime state=mounted
 
 - name: Configure the MongoDB Partition
   hosts: Ubuntu
   become: True
   vars:
-       user_account: "root"
        device_name: "/dev/sdd"
        group_name: "mongodb"
        volume_name: "storage"
@@ -93,9 +84,6 @@
       - file: path={{ lvcreate_guard }} state=touch
       - command: /sbin/mkfs.xfs /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
       - file: path={{ mkfs_guard }} state=touch
-      - command: /bin/mkdir --parents {{ mount_point }}
-      - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} xfs defaults 0 0"
-      - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
-      - command: /bin/mount -a
+      - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=xfs opts=noatime state=mounted
 
 
