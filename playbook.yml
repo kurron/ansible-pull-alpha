@@ -94,3 +94,15 @@
   tasks:
       - apt: name=mysql-server-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
 
+- name: Install RabbitMQ
+  hosts: Ubuntu
+  become: True
+  vars:
+       version: "1.2.3"
+  tasks:
+      - apt_key: url='https://www.rabbitmq.com/rabbitmq-release-signing-key.asc' state=present
+      - apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present update_cache=yes
+      - apt: name=rabbitmq-server state=present update_cache=true cache_valid_time=3600 install_recommends=true
+#     - copy: src=files/rabbitmq.config dest=/etc/rabbitmq owner=root group=root mode=644 backup=yes
+      - command: rabbitmq-plugins enable rabbitmq_management
+      - service: name=rabbitmq-server state=restarted
