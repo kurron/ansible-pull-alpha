@@ -7,8 +7,34 @@
     - name: create groups based on distribution
       group_by: key={{ ansible_distribution }}
 
+- name: Configure the MySQL Partition
+  hosts: Ubuntu
+  become: True
+  vars:
+       user_account: "root"
+       device_name: "/dev/sdb"
+       group_name: "mysql"
+       volume_name: "storage"
+       volume_size: "8G"
+       mount_point: "/mnt/mysql"
+       guard_prefix: "ansible-mysql-"
+  tasks:
+      - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      - command: /sbin/pvcreate {{ device_name }} creates=/var/{{ guard_prefix }}-pvcreate
+      - command: /usr/bin/touch /var/{{ guard_prefix }}-pvcreate
+      - command: /sbin/vgcreate {{ group_name }} {{ device_name }} creates=/var/{{ guard_prefix }}-vgcreate
+      - command: /usr/bin/touch /var/{{ guard_prefix }}-vgcreate
+      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }} creates=/var/{{ guard_prefix }}-lvcreate
+      - command: /usr/bin/touch /var/{{ guard_prefix }}-lvcreate
+      - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }} creates=/var/{{ guard_prefix }}-mkfs.ext4
+      - command: /usr/bin/touch /var/{{ guard_prefix }}-mkfs.ext4
+      - command: /bin/mkdir --parents {{ mount_point }}
+      - lineinfile: dest=/etc/fstab line="/dev/{{ group_name }}/{{ volume_name }} {{ mount_point }} ext4 defaults 0 0"
+      - file: path={{ mount_point }} owner={{ user_account }} group={{ user_account }} recurse=true state=directory
+      - command: /bin/mount -a
+
 - name: Custom Desktop tweeks
-  hosts: Ubuntu 
+  hosts: nobody
   become: True
   tasks:
       - name: Add silly environment variable
@@ -55,7 +81,7 @@
       - shell: cd /home/vagrant/GitHub/git-secrets ; make install
 
 - name: Tools I Like
-  hosts: Ubuntu
+  hosts: nobody
   become: True
   tasks:
       - apt: name=tree state=latest
