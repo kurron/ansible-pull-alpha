@@ -103,7 +103,26 @@
       - apt_key: url='https://www.rabbitmq.com/rabbitmq-release-signing-key.asc' state=present
       - apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present update_cache=yes
       - apt: name=rabbitmq-server state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      # we need to figure out how to make RabbitMQ look for its configuration on a stable partition!
       - copy: src=files/rabbitmq.config dest=/etc/rabbitmq owner=root group=root mode=644 backup=yes
       - command: rabbitmq-plugins enable rabbitmq_management
       - service: name=rabbitmq-server state=restarted
       - command: rabbitmqctl status
+
+- name: Install MongoDB
+  hosts: Ubuntu
+  become: True
+  vars:
+       cacheSizeGB: 1
+       notablescan: 0
+       profilingMode: "slowOp" 
+       storageDirectory: "/var/lib/mongodb" 
+  tasks:
+    - apt_key: state=present keyserver=keyserver.ubuntu.com id=EA312927
+    - apt_repository: repo='deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse' state=present
+    - apt: name=mongodb-org state=latest update_cache=true cache_valid_time=3600 install_recommends=true
+    - template: src=templates/mongod.conf dest=/etc/mongod.conf mode=0444 backup=yes force=yes
+    - file: path={{ storageDirectory }} owner=mongodb group=mongodb mode=0775 state=directory recurse=true
+    - copy: src=files/disable-transparent-hugepages dest=/etc/init.d/disable-transparent-hugepages mode=0755 backup=no force=yes
+    - command: /usr/sbin/update-rc.d disable-transparent-hugepages defaults
+    - service: name=mongod state=restarted
