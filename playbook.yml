@@ -86,4 +86,11 @@
       - file: path={{ mkfs_guard }} state=touch
       - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=xfs opts=noatime state=mounted
 
+- name: Install MySQL
+  hosts: Ubuntu
+  become: True
+  vars:
+       version: "5.6"
+  tasks:
+      - apt: name=mysql-server state=present update_cache=true cache_valid_time=3600 install_recommends=true
 
