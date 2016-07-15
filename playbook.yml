@@ -13,31 +13,19 @@
   gather_facts: True
   sudo: True
   vars:
-       guard_name: "swapfile"
        swap_size: "4G"
        swap_path: "/swapfile"
        swappiness: "vm.swappiness=10"
        inode: "vm.vfs_cache_pressure=50"
-       guard_prefix: "ansible-swapfile"
-       fallocate_guard: "/var/{{ guard_prefix }}-fallocate"
-       mkswap_guard: "/var/{{ guard_prefix }}-mkswap"
-       swapon_guard: "/var/{{ guard_prefix }}-swapon"
-       swappiness_guard: "/var/{{ guard_prefix }}-swappiness"
-       inode_guard: "/var/{{ guard_prefix }}-inode"
   tasks:
-      - command: /usr/bin/fallocate --length {{ swap_size }} {{ swap_path }} creates={{ fallocate_guard }}
-      - file: path={{ fallocate_guard }} state=touch
+      - command: /usr/bin/fallocate --length {{ swap_size }} {{ swap_path }}
       - file: path={{ swap_path }} owner=root group=root mode=0600
-      - command: /sbin/mkswap {{ swap_path }} creates={{ mkswap_guard }}
-      - file: path={{ mkswap_guard }} state=touch
-      - command: /sbin/swapon {{ swap_path }} creates={{ swapon_guard }}
-      - file: path={{ swapon_guard }} state=touch
+      - command: /sbin/mkswap {{ swap_path }}
+      - command: /sbin/swapon {{ swap_path }}
       - lineinfile: dest=/etc/fstab line="{{ swap_path }}   none    swap    sw    0   0"
-      - command: /sbin/sysctl {{ swappiness }} creates={{ swappiness_guard }}
-      - file: path={{ swappiness_guard }} state=touch
+      - command: /sbin/sysctl {{ swappiness }}
       - lineinfile: dest=/etc/sysctl.conf line="{{ swappiness }}"
-      - command: /sbin/sysctl {{ inode }} creates={{ inode_guard }}
-      - file: path={{ inode_guard }} state=touch
+      - command: /sbin/sysctl {{ inode }}
       - lineinfile: dest=/etc/sysctl.conf line="{{ inode }}"
 
 - name: Configure the MySQL Partition
@@ -49,21 +37,12 @@
        volume_name: "storage"
        volume_size: "7G"
        mount_point: "/var/lib/mysql"
-       guard_prefix: "ansible-mysql"
-       pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
-       vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
-       lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
-       mkfs_guard: "/var/{{ guard_prefix }}-mkfs"
   tasks:
       - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
-      - command: /sbin/pvcreate {{ device_name }} creates={{ pvcreate_guard }}
-      - file: path={{ pvcreate_guard }} state=touch
-      - command: /sbin/vgcreate {{ group_name }} {{ device_name }} creates={{ vgcreate_guard }}
-      - file: path={{ vgcreate_guard }} state=touch
-      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }} creates={{ lvcreate_guard }}
-      - file: path={{ lvcreate_guard }} state=touch
-      - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
-      - file: path={{ mkfs_guard }} state=touch
+      - command: /sbin/pvcreate {{ device_name }}
+      - command: /sbin/vgcreate {{ group_name }} {{ device_name }}
+      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }}
+      - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }}
       - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=ext4 opts=noatime state=mounted
 
 - name: Configure the RabbitMQ Partition
@@ -75,21 +54,12 @@
        volume_name: "storage"
        volume_size: "7G"
        mount_point: "/var/lib/rabbitmq"
-       guard_prefix: "ansible-rabbitmq"
-       pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
-       vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
-       lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
-       mkfs_guard: "/var/{{ guard_prefix }}-mkfs"
   tasks:
       - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
-      - command: /sbin/pvcreate {{ device_name }} creates={{ pvcreate_guard }}
-      - file: path={{ pvcreate_guard }} state=touch
-      - command: /sbin/vgcreate {{ group_name }} {{ device_name }} creates={{ vgcreate_guard }}
-      - file: path={{ vgcreate_guard }} state=touch
-      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }} creates={{ lvcreate_guard }}
-      - file: path={{ lvcreate_guard }} state=touch
-      - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
-      - file: path={{ mkfs_guard }} state=touch
+      - command: /sbin/pvcreate {{ device_name }}
+      - command: /sbin/vgcreate {{ group_name }} {{ device_name }}
+      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }}
+      - command: /sbin/mkfs.ext4 /dev/{{ group_name }}/{{ volume_name }}
       - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=ext4 opts=noatime state=mounted
 
 - name: Configure the MongoDB Partition
@@ -101,22 +71,13 @@
        volume_name: "storage"
        volume_size: "7G"
        mount_point: "/var/lib/mongodb"
-       guard_prefix: "ansible-mongodb"
-       pvcreate_guard: "/var/{{ guard_prefix }}-pvcreate"
-       vgcreate_guard: "/var/{{ guard_prefix }}-vgcreate"
-       lvcreate_guard: "/var/{{ guard_prefix }}-lvcreate"
-       mkfs_guard: "/var/{{ guard_prefix }}-mkfs"
   tasks:
       - apt: name=xfsprogs state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=lvm2 state=present update_cache=true cache_valid_time=3600 install_recommends=true
-      - command: /sbin/pvcreate {{ device_name }} creates={{ pvcreate_guard }}
-      - file: path={{ pvcreate_guard }} state=touch
-      - command: /sbin/vgcreate {{ group_name }} {{ device_name }} creates={{ vgcreate_guard }}
-      - file: path={{ vgcreate_guard }} state=touch
-      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }} creates={{ lvcreate_guard }}
-      - file: path={{ lvcreate_guard }} state=touch
-      - command: /sbin/mkfs.xfs /dev/{{ group_name }}/{{ volume_name }} creates={{ mkfs_guard }}
-      - file: path={{ mkfs_guard }} state=touch
+      - command: /sbin/pvcreate {{ device_name }}
+      - command: /sbin/vgcreate {{ group_name }} {{ device_name }}
+      - command: /sbin/lvcreate --name {{ volume_name }} --size {{ volume_size }} {{ group_name }}
+      - command: /sbin/mkfs.xfs /dev/{{ group_name }}/{{ volume_name }}
       - mount: name={{ mount_point }} src=/dev/{{ group_name }}/{{ volume_name }} fstype=xfs opts=noatime state=mounted
 
 - name: Install MySQL
@@ -134,7 +95,7 @@
        version: "1.2.3"
   tasks:
       # we need to figure out how to make RabbitMQ look for its configuration on a stable partition!
-      - template: src=templates/rabbitmq.config dest=/etc/rabbitmq.config mode=0444 backup=yes force=yes
+      - template: src=templates/rabbitmq.config dest=/etc/rabbitmq/rabbitmq.config mode=0444 backup=yes force=yes
       - apt_key: url='https://www.rabbitmq.com/rabbitmq-release-signing-key.asc' state=present
       - apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present update_cache=yes
       - apt: name=rabbitmq-server state=present update_cache=true cache_valid_time=3600 install_recommends=true
