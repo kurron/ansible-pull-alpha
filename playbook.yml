@@ -87,7 +87,7 @@
        version: "5.6"
   tasks:
       - file: path=/etc/mysql/conf.d state=directory mode=0755
-      - template: src=templates/mysql.cnf dest=/etc/mysql/conf.d/sushe.cnf mode=0440 backup=yes force=yes
+      - template: src=templates/mysql.cnf dest=/etc/mysql/conf.d/transparent-language.cnf mode=0440 backup=yes force=yes
       - apt: name=mysql-server-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
