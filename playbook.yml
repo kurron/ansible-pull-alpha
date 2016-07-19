@@ -89,7 +89,7 @@
       - apt: name=mysql-server-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
-      - mysql_db: name=mli4ever login_user=root login_password=mysql state=present
+      - mysql_db: name=mli4ever state=present
 
 - name: Install RabbitMQ
   hosts: Ubuntu
