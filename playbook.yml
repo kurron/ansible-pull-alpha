@@ -6,6 +6,7 @@
   tasks:
     - name: create groups based on distribution
       group_by: key={{ ansible_distribution }}
+    - hostname: name=alpha
 
 # https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
 - name: Add Swap File
@@ -92,6 +93,7 @@
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
       - mysql_db: name=mli4ever state=present
+      - mysql_user: name=mli password=mli priv=*.*:ALL state=present
 
 - name: Install RabbitMQ
   hosts: Ubuntu
