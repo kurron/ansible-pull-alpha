@@ -87,6 +87,7 @@
        version: "5.6"
   tasks:
       - apt: name=mysql-server-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      - mysql_db: name=mli4ever state=present
 
 - name: Install RabbitMQ
   hosts: Ubuntu
