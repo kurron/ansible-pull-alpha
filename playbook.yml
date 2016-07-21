@@ -90,10 +90,11 @@
       - file: path=/etc/mysql/conf.d state=directory mode=0755
       - template: src=templates/mysql.cnf dest=/etc/mysql/conf.d/transparent-language.cnf mode=0440 backup=yes force=yes
       - apt: name=mysql-server-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
+      - apt: name=mysql-client-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
       - mysql_db: name=mli4ever state=present
-      - mysql_user: name=mli password=mli priv=*.*:ALL state=present
+      - mysql_user: name=mli password=mli priv="*.*:ALL,GRANT" state=present check_implicit_admin=yes
 
 - name: Install RabbitMQ
   hosts: Ubuntu
