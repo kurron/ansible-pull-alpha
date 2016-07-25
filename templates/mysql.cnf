@@ -1,3 +1,4 @@
 [mysqld]
 character-set-server=utf8
 bind-address=*
+lower_case_table_names = 1
