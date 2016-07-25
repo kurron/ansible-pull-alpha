@@ -93,8 +93,10 @@
       - apt: name=mysql-client-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
-      - mysql_db: name=mli4ever state=present
-      - mysql_user: host="%" name="mli" password="mli" priv="*.*:ALL" state=present check_implicit_admin=yes sql_log_bin=no
+      - mysql_db: name="mli" encoding="utf8" collation="utf8_unicode_ci" state=present
+      - mysql_user: host="%" name="mli" password="mli" priv="mli.*:ALL" state=present check_implicit_admin=yes
+      - mysql_db: name="lds" encoding="utf8" collation="utf8_unicode_ci" state=present
+      - mysql_user: host="%" name="lds" password="lds" priv="lds.*:ALL" state=present check_implicit_admin=yes
 
 - name: Install RabbitMQ
   hosts: Ubuntu
