@@ -114,7 +114,7 @@
   vars:
        version: "1.2.3"
   tasks:
-      # we need to figure out how to make RabbitMQ look for its configuration on a stable partition!
+#TODO: we need to figure out how to make RabbitMQ look for its configuration on a stable partition!
       - apt_key: url='https://www.rabbitmq.com/rabbitmq-release-signing-key.asc' state=present
       - apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present update_cache=yes
       - apt: name=rabbitmq-server state=present update_cache=true cache_valid_time=3600 install_recommends=true
@@ -122,6 +122,14 @@
       - template: src=templates/rabbitmq.config dest=/etc/rabbitmq/rabbitmq.config mode=0444 backup=yes force=yes
       - service: name=rabbitmq-server state=restarted
       - command: rabbitmqctl status
+      - rabbitmq_vhost: name=/rr5 state=present
+      - rabbitmq_user: user=tlo
+                       password=tlo
+                       vhost=/rr5
+                       configure_priv=.*
+                       read_priv=.*
+                       write_priv=.*
+                       state=present
 
 - name: Install MongoDB
   hosts: Ubuntu
