@@ -94,12 +94,19 @@
       - apt: name=mysql-client-{{ version }} state=present update_cache=true cache_valid_time=3600 install_recommends=true
       - apt: name=python-mysqldb state=present update_cache=true cache_valid_time=3600 install_recommends=true
 #     - pip: name=MySQL-python
+
       - mysql_db: name="mli" encoding="utf8" collation="utf8_unicode_ci" state=present
       - mysql_user: host="%" name="mli" password="mli" priv="mli.*:ALL" state=present check_implicit_admin=yes
+
       - get_url: url=http://192.168.254.81:81/artifactory/static/lds/lds-898-trimmed.sql dest=/tmp/lds.sql mode=0440
       - mysql_db: name="langs" encoding="utf8" collation="utf8_unicode_ci" state=present
       - mysql_db: name="langs" target=/tmp/lds.sql state=import
       - mysql_user: host="%" name="lds" password="lds" priv="langs.*:ALL" state=present check_implicit_admin=yes
+
+      - mysql_db: name="box" encoding="utf8" collation="utf8_unicode_ci" state=present
+      - mysql_db: name="console" encoding="utf8" collation="utf8_unicode_ci" state=present
+      - mysql_user: host="%" name="bykieweb" password="bykiweb" priv="box.*:ALL" state=present check_implicit_admin=yes
+      - mysql_user: host="%" name="bykieweb" password="bykiweb" priv="console.*:ALL" state=present check_implicit_admin=yes
 
 - name: Install RabbitMQ
   hosts: Ubuntu
