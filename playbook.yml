@@ -122,10 +122,10 @@
       - template: src=templates/rabbitmq.config dest=/etc/rabbitmq/rabbitmq.config mode=0444 backup=yes force=yes
       - service: name=rabbitmq-server state=restarted
       - command: rabbitmqctl status
-      - rabbitmq_vhost: name=/rr5 state=present
+      - rabbitmq_vhost: name=/bwedu state=present
       - rabbitmq_user: user=tlo
                        password=tlo
-                       vhost=/rr5
+                       vhost=/bwedu
                        configure_priv=.*
                        read_priv=.*
                        write_priv=.*
