@@ -105,8 +105,7 @@
 
       - mysql_db: name="box" encoding="utf8" collation="utf8_unicode_ci" state=present
       - mysql_db: name="console" encoding="utf8" collation="utf8_unicode_ci" state=present
-      - mysql_user: host="%" name="bykiweb" password="bykiweb" priv="box.*:ALL" state=present check_implicit_admin=yes
-      - mysql_user: host="%" name="bykiweb" password="bykiweb" priv="console.*:ALL" state=present check_implicit_admin=yes
+      - mysql_user: host="%" name="bykiweb" password="bykiweb" priv="box.*:ALL,console.*:ALL" state=present check_implicit_admin=yes
 
 - name: Install RabbitMQ
   hosts: Ubuntu
